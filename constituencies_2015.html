@@ -49,9 +49,10 @@
           recv_json(json);
         });
         // Set the anchors to point to the correct petition
-        $('#petition-link').attr("href", "https://petition.parliament.uk/petitions/" + id)
-        $('#permalink').attr("href", "https://petition.parliament.uk/petitions/" + id)
-        $('#permalink').text("Permalink: https://petition.parliament.uk/petitions/" + id)
+        $('#petition-link').attr("href", "https://petition.parliament.uk/petitions/" + id);
+        $('#permalink').attr("href", window.location + "?" + id);
+        console.log(window.location);
+        $('#permalink').text("Permalink: " + window.location + "?" + id);
     }
     function init() {
         var map_element = document.getElementById("svg_map");
