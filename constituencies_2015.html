@@ -105,6 +105,11 @@
             $('#reset-button').attr("style", "display: initial;")
         }
     }
+    function resetTransform() {
+        scale = 1.0;
+        trans = [0, 0];
+        updateTransform();
+    }
     function init() {
         var map_element = document.getElementById("svg-map");
         map = map_element.contentDocument;
@@ -211,6 +216,9 @@
     </header>
     <div id="map-area" style="position: relative;">
         <object data="constituencies_2015.svg" id="svg-map" type="image/svg+xml"></object><br/>
+        <div id="reset-float" style="position: absolute; top: 0; right: 0;">
+            <button id="reset-button" style="display: none;" onclick="resetTransform();">Reset zoom</button>
+        </div>
     </div>
     <div id="controls"><p>
         Fetch petition:
