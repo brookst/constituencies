@@ -37,7 +37,7 @@
         var magnitude=data.signature_count * max_factor;
         <!-- console.log(name + "=" + magnitude); -->
         var svg_element=map.getElementById(name);
-        svg_element.setAttribute("style", "fill: rgb(" + CubeHelixRGB(magnitude, 3.0, 1.5, 1.0, 1.2) + ");");
+        svg_element.setAttribute("style", "fill: rgb(" + CubeHelixRGB(1 - magnitude, 3.0, 1.5, 1.0, 1.2) + ");");
         <!-- console.log(svg_element.getAttribute("style")); -->
     }
     function loadPetition(id) {
