@@ -5,6 +5,8 @@
     <script type="text/javascript">
     var map;
     var max_factor;
+    var scale = 1.0; var trans = [0,0];
+    var current_trans = null;
     function recvJson(json) {
         <!-- console.log("Recieved json"); -->
         console.log(json.data.attributes.action);
@@ -55,10 +57,62 @@
         console.log(window.location);
         $('#permalink').text("Permalink: " + location + "?id=" + id);
     }
+    function wheelEvent(ev) {
+        ev.preventDefault();
+        var old_scale = scale;
+        scale -= (ev.deltaY / 50.0);
+        console.log("scale: " + old_scale + " -> " + scale);
+        old_scale = (scale / old_scale - 1);
+        trans[0] += old_scale * (trans[0] - ev.clientX);
+        trans[1] += old_scale * (trans[1] - ev.clientY);
+        updateTransform();
+    }
+    function pressEvent(ev) {
+        ev.preventDefault();
+        if (current_trans != null) {
+            return;
+        } else {
+            current_trans = {x: ev.clientX, y: ev.clientY};
+            console.log("Start drag at: " + current_trans.x + ", " + current_trans.y);
+        }
+    }
+    function depressEvent(ev) {
+        ev.preventDefault();
+        console.log("Stop drag at: " + current_trans.x + ", " + current_trans.y);
+        current_trans = null;
+    }
+    function moveEvent(ev) {
+        ev.preventDefault();
+        if (current_trans === null) {
+            return;
+        } else {
+            trans[0] += ev.clientX - current_trans.x; current_trans.x = ev.clientX;
+            trans[1] += ev.clientY - current_trans.y; current_trans.y = ev.clientY;
+            updateTransform();
+        }
+    }
+    function updateTransform() {
+        map.rootElement.setAttribute("transform",
+                "translate(" + trans[0] + "," + trans[1] + ") "
+                + "scale(" + scale + ")"
+        );
+        var visible = $('#reset-button').attr("style") != "display: none;";
+        if (scale == 1.0 && visible) {
+            console.log("Hiding #reset-button");
+            $('#reset-button').attr("style", "display: none;")
+        } else if (!visible) {
+            console.log("Showing #reset-button");
+            $('#reset-button').attr("style", "display: initial;")
+        }
+    }
     function init() {
         var map_element = document.getElementById("svg-map");
         map = map_element.contentDocument;
         resizeImage();
+        map.addEventListener("mousedown", pressEvent);
+        map.addEventListener("mouseup", depressEvent);
+        map.addEventListener("mousemove", moveEvent);
+        map.addEventListener("wheel", wheelEvent);
 
         var petition_id = parseURLParams(window.location.search);
         if (petition_id) {
