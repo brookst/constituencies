@@ -52,10 +52,10 @@
         });
         // Set the anchors to point to the correct petition
         $('#petition-link').attr("href", "https://petition.parliament.uk/petitions/" + id);
-        var location = window.location.toString().replace(/\?.*/g, "");
-        $('#permalink').attr("href", location + "?id=" + id);
+        var location = window.location.toString().replace(/\?.*/g, "") + "?id=" + id;
+        $('#permalink').attr("href", location);
         console.log(window.location);
-        $('#permalink').text("Permalink: " + location + "?id=" + id);
+        $('#permalink').text(location);
     }
     function wheelEvent(ev) {
         ev.preventDefault();
@@ -229,8 +229,9 @@
         <span id="error-text"></span>
     </p></div>
     <div id="info"><p>
-        <a id="permalink">Permalink</a>
         <a href="https://petition.parliament.uk/petitions?state=all">See the list of petitions here.</a>
+        </p><p>
+        Permalink: <a id="permalink"></a>
     </p><div>
     <footer>
         <span><a href="https://www.mrao.cam.ac.uk/~dag/CUBEHELIX/">Cubehelix by <i>Dave Green</i></a></span> |
