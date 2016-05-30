@@ -1,10 +1,11 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js" type="text/javascript"></script>
     <script type="text/javascript">
     var map;
     var max_factor;
-    function recv_json(json) {
+    function recvJson(json) {
         <!-- console.log("Recieved json"); -->
         console.log(json.data.attributes.action);
         // Set petition information
@@ -19,9 +20,8 @@
         });
         max_factor = 1.0 / max_factor;
         $.each(signatures, function (data) {
-                paint_constituency(signatures[data]);
+                paintConstituency(signatures[data]);
         });
-        <!-- paint_constituency(signatures[0]); -->
         if (max_factor == 0) {
             console.log("Intercept error: " + max_factor);
             $('#error-text').text("something went wrong with that request :(");
@@ -29,7 +29,7 @@
             $('#error-text').text("");
         }
     }
-    function paint_constituency(data) {
+    function paintConstituency(data) {
         <!-- console.log(data); -->
         <!-- console.log(data.name + ": " + data.signature_count); -->
         var name=data.name.replace(/ |,/g, "_");
@@ -40,13 +40,13 @@
         svg_element.setAttribute("style", "fill: rgb(" + CubeHelixRGB(magnitude, 3.0, 1.5, 1.0, 1.2) + ");");
         <!-- console.log(svg_element.getAttribute("style")); -->
     }
-    function load_petition(id) {
+    function loadPetition(id) {
         // Zero the scale factor
         max_factor = 0;
 
-        // Request petition data with callback to `recv_json`
+        // Request petition data with callback to `recvJson`
         $.getJSON("https://petition.parliament.uk/petitions/" + id + ".json", function(json) {
-          recv_json(json);
+          recvJson(json);
         });
         // Set the anchors to point to the correct petition
         $('#petition-link').attr("href", "https://petition.parliament.uk/petitions/" + id);
@@ -56,7 +56,7 @@
         $('#permalink').text("Permalink: " + location + "?id=" + id);
     }
     function init() {
-        var map_element = document.getElementById("svg_map");
+        var map_element = document.getElementById("svg-map");
         map = map_element.contentDocument;
         resizeImage();
 
@@ -67,8 +67,8 @@
         if (petition_id === undefined) {
             petition_id = 114003; // Default to Trump
         }
-        $('#new_id').val(petition_id);
-        load_petition(petition_id);
+        $('#new-id').val(petition_id);
+        loadPetition(petition_id);
     }
     // CubeHelix (https://www.mrao.cam.ac.uk/~dag/CUBEHELIX/)
     // Use start=3.0, rots=1.5, hue=1.0, gamma=1.2
@@ -116,13 +116,13 @@
         return parms;
     }
     function change() {
-        var new_petition = $('#new_id').val();
+        var new_petition = $('#new-id').val();
         console.log("New id: " + new_petition);
         if (new_petition == "") {
             console.log("Empty petition id");
             return
         }
-        load_petition(new_petition);
+        loadPetition(new_petition);
     }
     function resizeImage(){
         // Set image style to a size that will fit in the page
@@ -139,26 +139,28 @@
         map.rootElement.setAttribute("height", cand_h);
     }
     </script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js" type="text/javascript"></script>
     <style media="screen" type="text/css">
         * { margin: 0; padding: 0; }
         body { background:#CCC; font-family: "Balthazar", "Droid Serif", Times New Roman, serif; color: #000; font-size: 1em; margin: 8px; padding: 0; }
-        h1 { font-family: "Balthazar", serif; color: #000; font-size: 3.6em; margin-bottom: 6px; text-align: center; }
+        h1 { font-family: "Tebuchet MS", Verdana, Arial, sans-serif; color: #000; font-size: 3.6em; margin-bottom: 6px; text-align: center; }
         p { font-family: "Balthazar", "Droid Serif", Times New Roman, serif; color: #000; margin: 15px; }
         a { color: #5582d6; text-decoration: none; }
         #controls { font-size: 1.8em; text-align: center; }
         #info { text-align: center; }
+        #map-area { text-align: center; }
     </style>
-
-
 </head>
 <body onload="init();">
-    <a id="petition-link" href="https://petition.parliament.uk/petitions/107516"><h1 id="action"></h1></a>
-    <h3 id="background"></h3>
-    <object data="constituencies_2015.svg" id="svg_map" type="image/svg+xml"></object><br/>
+    <header>
+        <a id="petition-link" href="https://petition.parliament.uk/petitions/107516"><h1 id="action"></h1></a>
+        <h3 id="background"></h3>
+    </header>
+    <div id="map-area" style="position: relative;">
+        <object data="constituencies_2015.svg" id="svg-map" type="image/svg+xml"></object><br/>
+    </div>
     <div id="controls"><p>
         Fetch petition:
-        <input name="new_id" id="new_id" type="number" min="1" max="999999" onchange="change();"></input>
+        <input name="new-id" id="new-id" type="number" min="1" max="999999" onchange="change();"></input>
         <span id="error-text"></span>
     </p></div>
     <div id="info"><p>
