@@ -8,13 +8,12 @@
     var scale = 1.0; var trans = [0,0];
     var current_trans = null;
     function recvJson(json) {
-        <!-- console.log("Recieved json"); -->
-        console.log(json.data.attributes.action);
+        console.log("Recieved petition data: " + json.data.attributes.action);
         // Set petition information
         $('#action').text(json.data.attributes.action);
         $('#background').text(json.data.attributes.background);
         var signatures = json.data.attributes.signatures_by_constituency;
-        <!-- console.log(signatures[0]); -->
+        // console.log(signatures[0]);
         $.each(signatures, function (data) {
             if (signatures[data].signature_count > max_factor) {
                 max_factor = signatures[data].signature_count;
@@ -32,20 +31,18 @@
         }
     }
     function paintConstituency(data) {
-        <!-- console.log(data); -->
-        <!-- console.log(data.name + ": " + data.signature_count); -->
         var name=data.name.replace(/ |,/g, "_");
-        <!-- var magnitude=Math.round(data.signature_count * max_factor); -->
         var magnitude=data.signature_count * max_factor;
-        <!-- console.log(name + "=" + magnitude); -->
+        // console.log(name + "("+ data.signature_count + ")"+ "=" + magnitude);
         var svg_element=map.getElementById(name);
         svg_element.setAttribute("style", "fill: rgb(" + CubeHelixRGB(1 - magnitude, 3.0, 1.5, 1.0, 1.2) + ");");
-        <!-- console.log(svg_element.getAttribute("style")); -->
+        // console.log(svg_element.getAttribute("style"));
     }
     function loadPetition(id) {
         // Zero the scale factor
         max_factor = 0;
 
+        console.log("Loading petition from https://petition.parliament.uk/petitions/" + id + ".json");
         // Request petition data with callback to `recvJson`
         $.getJSON("https://petition.parliament.uk/petitions/" + id + ".json", function(json) {
           recvJson(json);
@@ -61,11 +58,15 @@
         ev.preventDefault();
         var old_scale = scale;
         scale -= (ev.deltaY / 50.0);
+
+        // Cap scale above 100%
         if (scale < 1.0) {
             scale = 1.0;
         }
-        console.log("scale: " + old_scale + " -> " + scale);
+
+        // console.log("scale: " + old_scale + " -> " + scale);
         old_scale = (scale / old_scale - 1);
+        // Update transform such that the zoom is around the cursor
         trans[0] += old_scale * (trans[0] - ev.clientX);
         trans[1] += old_scale * (trans[1] - ev.clientY);
         updateTransform();
@@ -75,13 +76,13 @@
         if (current_trans != null) {
             return;
         } else {
+            // console.log("Start drag at: " + current_trans.x + ", " + current_trans.y);
             current_trans = {x: ev.clientX, y: ev.clientY};
-            console.log("Start drag at: " + current_trans.x + ", " + current_trans.y);
         }
     }
     function depressEvent(ev) {
         ev.preventDefault();
-        console.log("Stop drag at: " + current_trans.x + ", " + current_trans.y);
+        // console.log("Stop drag at: " + current_trans.x + ", " + current_trans.y);
         current_trans = null;
     }
     function moveEvent(ev) {
