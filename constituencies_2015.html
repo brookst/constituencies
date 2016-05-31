@@ -45,7 +45,7 @@
         console.log("Loading petition from https://petition.parliament.uk/petitions/" + id + ".json");
         // Request petition data with callback to `recvJson`
         $.getJSON("https://petition.parliament.uk/petitions/" + id + ".json", function(json) {
-          recvJson(json);
+            recvJson(json);
         });
         // Set the anchors to point to the correct petition
         $('#petition-link').attr("href", "https://petition.parliament.uk/petitions/" + id);
@@ -53,6 +53,28 @@
         $('#permalink').attr("href", location);
         console.log(window.location);
         $('#permalink').text(location);
+    }
+    function recvCatalog(json) {
+        console.log("Received catalog");
+        var petitions = json.data;
+        console.log(petitions[0].id + "(" +
+                    petitions[0].attributes.signature_count + "): " +
+                    petitions[0].attributes.action);
+        console.log(petitions[1].id + "(" +
+                    petitions[1].attributes.signature_count + "): " +
+                    petitions[1].attributes.action);
+        $('#petition-list').empty();
+        $.each(petitions, function(petition) {
+            var id = petitions[petition].id;
+            var entry = $("<a/>", {onclick: "loadPetition(" + id + ");"}).text(petitions[petition].attributes.action).wrap("<li/>").parent();
+            $('#petition-list').append(entry);
+        });
+    }
+    function loadCatalog() {
+        console.log("Loading petition catalog from https://petition.parliament.uk/petitions.json");
+        $.getJSON("https://petition.parliament.uk/petitions.json", function(json){
+            recvCatalog(json);
+        });
     }
     function wheelEvent(ev) {
         ev.preventDefault();
@@ -132,6 +154,8 @@
         }
         $('#new-id').val(petition_id);
         loadPetition(petition_id);
+
+        loadCatalog();
     }
     // CubeHelix (https://www.mrao.cam.ac.uk/~dag/CUBEHELIX/)
     // Use start=3.0, rots=1.5, hue=1.0, gamma=1.2
@@ -189,7 +213,7 @@
     }
     function resizeImage(){
         // Set image style to a size that will fit in the page
-        var page_w = window.innerWidth;
+        var page_w = window.innerWidth * 0.8;
         var page_h = window.innerHeight;
         page_w -= 15 * 2; // Subtract padding
         page_h -= 15;
@@ -203,14 +227,43 @@
     }
     </script>
     <style media="screen" type="text/css">
-        * { margin: 0; padding: 0; }
-        body { background:#CCC; font-family: "Balthazar", "Droid Serif", Times New Roman, serif; color: #000; font-size: 1em; margin: 8px; padding: 0; }
-        h1 { font-family: "Tebuchet MS", Verdana, Arial, sans-serif; color: #000; font-size: 3.6em; margin-bottom: 6px; text-align: center; }
-        p { font-family: "Balthazar", "Droid Serif", Times New Roman, serif; color: #000; margin: 15px; }
-        a { color: #5582d6; text-decoration: none; }
+        body {
+            background: #CCC;
+            font-family: "Balthazar", "Droid Serif", Times New Roman, serif;
+            color: #000;
+            font-size: 1em;
+            margin: 8px;
+            padding: 0;
+        }
+        h1 {
+            font-family: "Tebuchet MS", Verdana, Arial, sans-serif;
+            color: #000;
+            font-size: 1.5em;
+            margin-top: 6px;
+            margin-bottom: 6px;
+            text-align: center;
+        }
+        p { font-family: "Balthazar", "Droid Serif", Times New Roman, serif;
+            color: #000;
+            margin: 15px;
+        }
+        a { color: #5582d6; text-decoration: none; cursor: pointer; }
+        ul { list-style-type: circle; }
         #controls { font-size: 1.8em; text-align: center; }
         #info { text-align: center; }
-        #map-area { text-align: center; }
+        #map-area {
+            text-align: center;
+            display: inline-block;
+            position: relative;
+            width: 80%;
+        }
+        #list-area {
+            display: inline-block;
+            vertical-align: top;
+            overflow-y: scroll;
+            height: 400px;
+            width: 20%;
+        }
     </style>
 </head>
 <body onload="init();">
@@ -218,8 +271,10 @@
         <a id="petition-link" href="https://petition.parliament.uk/petitions/107516"><h1 id="action"></h1></a>
         <h3 id="background"></h3>
     </header>
-    <div id="map-area" style="position: relative;">
-        <object data="constituencies_2015.svg" id="svg-map" type="image/svg+xml"></object><br/>
+    <div id="list-area">
+        <ul id="petition-list"></ul>
+    </div><div id="map-area">
+        <object data="constituencies_2015.svg" id="svg-map" type="image/svg+xml"></object>
         <div id="reset-float" style="position: absolute; top: 0; right: 0;">
             <button id="reset-button" style="display: none;" onclick="resetTransform();">Reset zoom</button>
         </div>
@@ -230,8 +285,6 @@
         <span id="error-text"></span>
     </p></div>
     <div id="info"><p>
-        <a href="https://petition.parliament.uk/petitions?state=all">See the list of petitions here.</a>
-        </p><p>
         Permalink: <a id="permalink"></a>
     </p><div>
     <footer>
