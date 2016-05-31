@@ -126,7 +126,7 @@
         if (scale == 1.0 && visible) {
             console.log("Hiding #reset-button");
             $('#reset-button').attr("style", "display: none;")
-        } else if (!visible) {
+        } else if (scale != 1.0 && !visible) {
             console.log("Showing #reset-button");
             $('#reset-button').attr("style", "display: initial;")
         }
