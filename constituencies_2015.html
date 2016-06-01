@@ -56,13 +56,29 @@
     }
     function recvCatalog(json) {
         console.log("Received catalog");
+        console.log(json);
+        var controls = $("#list-controls");
+        controls.empty();
+        controls.append($("<a/>", {onclick: "loadCatalog(\"" + json.links.first + "\");"}).text("first"));
+        controls.append(" | ");
+        if (json.links.prev == null) {
+            controls.append("prev");
+        } else {
+            controls.append($("<a/>", {onclick: "loadCatalog(\"" + json.links.prev + "\");"}).text("prev"));
+        }
+        controls.append(" | ");
+        if (json.links.next == null) {
+            controls.append("next");
+        } else {
+            controls.append($("<a/>", {onclick: "loadCatalog(\"" + json.links.next + "\");"}).text("next"));
+        }
+        controls.append(" | ");
+        controls.append($("<a/>", {onclick: "loadCatalog(\"" + json.links.last + "\");"}).text("last"));
+
         var petitions = json.data;
-        console.log(petitions[0].id + "(" +
-                    petitions[0].attributes.signature_count + "): " +
-                    petitions[0].attributes.action);
-        console.log(petitions[1].id + "(" +
-                    petitions[1].attributes.signature_count + "): " +
-                    petitions[1].attributes.action);
+        // console.log(petitions[0].id + "(" +
+        //             petitions[0].attributes.signature_count + "): " +
+        //             petitions[0].attributes.action);
         $('#petition-list').empty();
         $.each(petitions, function(petition) {
             var id = petitions[petition].id;
@@ -70,9 +86,12 @@
             $('#petition-list').append(entry);
         });
     }
-    function loadCatalog() {
-        console.log("Loading petition catalog from https://petition.parliament.uk/petitions.json");
-        $.getJSON("https://petition.parliament.uk/petitions.json", function(json){
+    function loadCatalog(url) {
+        if (url == null) {
+            url = "https://petition.parliament.uk/petitions.json";
+        }
+        console.log("Loading petition catalog from " + url);
+        $.getJSON(url, function(json){
             recvCatalog(json);
         });
     }
@@ -257,12 +276,17 @@
             position: relative;
             width: 80%;
         }
-        #list-area {
+        #sidebar {
             display: inline-block;
             vertical-align: top;
+            width: 20%;
+        }
+        #list-area {
             overflow-y: scroll;
             height: 400px;
-            width: 20%;
+        }
+        #list-controls {
+            text-align: center;
         }
     </style>
 </head>
@@ -271,8 +295,11 @@
         <a id="petition-link" href="https://petition.parliament.uk/petitions/107516"><h1 id="action"></h1></a>
         <h3 id="background"></h3>
     </header>
-    <div id="list-area">
-        <ul id="petition-list"></ul>
+    <div id="sidebar">
+        <div id="list-area">
+            <ul id="petition-list"></ul>
+        </div>
+        <div id="list-controls"></div>
     </div><div id="map-area">
         <object data="constituencies_2015.svg" id="svg-map" type="image/svg+xml"></object>
         <div id="reset-float" style="position: absolute; top: 0; right: 0;">
