@@ -19,6 +19,10 @@
                 max_factor = signatures[data].signature_count;
             }
         });
+        for (tick=0; tick <= 10; tick++) {
+            $('#scale').children()[tick*2+1].textContent = Math.round(max_factor * (1.0 - tick / 10.0));
+        }
+        console.log("max(signature_count): " + max_factor);
         max_factor = 1.0 / max_factor;
         $.each(signatures, function (data) {
              paintConstituency(signatures[data]);
@@ -35,7 +39,7 @@
         var magnitude=data.signature_count * max_factor;
         // console.log(name + "("+ data.signature_count + ")"+ "=" + magnitude);
         var svg_element=map.getElementById(name);
-        svg_element.setAttribute("style", "fill: rgb(" + CubeHelixRGB(1 - magnitude, 3.0, 1.5, 1.0, 1.2) + ");");
+        svg_element.setAttribute("style", "fill: rgb(" + palette(1 - magnitude) + ");");
         // console.log(svg_element.getAttribute("style"));
     }
     function loadPetition(id) {
@@ -51,12 +55,12 @@
         $('#petition-link').attr("href", "https://petition.parliament.uk/petitions/" + id);
         var location = window.location.toString().replace(/\?.*/g, "") + "?id=" + id;
         $('#permalink').attr("href", location);
-        console.log(window.location);
         $('#permalink').text(location);
+        $('#new-id').val(id);
     }
     function recvCatalog(json) {
         console.log("Received catalog");
-        console.log(json);
+        // console.log(json);
         var controls = $("#list-controls");
         controls.empty();
         controls.append($("<a/>", {onclick: "loadCatalog(\"" + json.links.first + "\");"}).text("first"));
@@ -94,6 +98,7 @@
         $.getJSON(url, function(json){
             recvCatalog(json);
         });
+        $("#list-area").animate({ scrollTop: 0 }, "fast");
     }
     function wheelEvent(ev) {
         ev.preventDefault();
@@ -138,8 +143,8 @@
     }
     function updateTransform() {
         map.rootElement.getElementById("uk").setAttribute("transform",
-                "translate(" + trans[0] / scale + "," + trans[1] / scale + ") "
-                + "scale(" + scale + ")"
+                "scale(" + scale + ")"
+                + "translate(" + trans[0] / scale + "," + trans[1] / scale + ") "
         );
         var visible = $('#reset-button').attr("style") != "display: none;";
         if (scale == 1.0 && visible) {
@@ -174,7 +179,15 @@
         $('#new-id').val(petition_id);
         loadPetition(petition_id);
 
+        for (tick=0; tick <= 10; tick++) {
+            $('#scale').children()[tick*2].setAttribute("style", "fill: rgb(" + palette(tick/10.0) + ");");
+        }
+        console.log(scale[0]);
+
         loadCatalog();
+    }
+    function palette(param) {
+        return CubeHelixRGB(param, 2.5, 1.5, 1.6, 1.0);
     }
     // CubeHelix (https://www.mrao.cam.ac.uk/~dag/CUBEHELIX/)
     // Use start=3.0, rots=1.5, hue=1.0, gamma=1.2
@@ -241,6 +254,7 @@
 
         map.rootElement.setAttribute("width", cand_w);
         map.rootElement.setAttribute("height", cand_h);
+        $('#map-area').width(cand_w);
         $('#list-area').height(cand_h - 22);
     }
     </script>
@@ -268,7 +282,8 @@
         }
         a { color: #5582d6; text-decoration: none; cursor: pointer; }
         ul { list-style-type: circle; }
-        #controls { font-size: 1.8em; text-align: center; }
+        footer { text-align: center; }
+        #controls { text-align: center; }
         #info { text-align: center; }
         #background { min-height: 75px; }
         #map-area {
@@ -302,7 +317,22 @@
         <div id="list-controls"></div>
     </div><div id="map-area">
         <object data="constituencies_2015.svg" id="svg-map" type="image/svg+xml"></object>
-        <div id="reset-float" style="position: absolute; top: 0; right: 0;">
+        <div id="scale-float" style="position: absolute; top: 0; right: 0;">
+            <svg id="scale" width="75" height="220">
+                <rect x="15" y="000" width="15" height="20"/><text x="30" y="015">000</text>
+                <rect x="15" y="020" width="15" height="20"/><text x="30" y="035">020</text>
+                <rect x="15" y="040" width="15" height="20"/><text x="30" y="055">040</text>
+                <rect x="15" y="060" width="15" height="20"/><text x="30" y="075">060</text>
+                <rect x="15" y="080" width="15" height="20"/><text x="30" y="095">080</text>
+                <rect x="15" y="100" width="15" height="20"/><text x="30" y="115">100</text>
+                <rect x="15" y="120" width="15" height="20"/><text x="30" y="135">120</text>
+                <rect x="15" y="140" width="15" height="20"/><text x="30" y="155">140</text>
+                <rect x="15" y="160" width="15" height="20"/><text x="30" y="175">160</text>
+                <rect x="15" y="180" width="15" height="20"/><text x="30" y="195">180</text>
+                <rect x="15" y="200" width="15" height="20"/><text x="30" y="215">200</text>
+            </svg>
+        </div>
+        <div id="reset-float" style="position: absolute; bottom: 0; right: 0;">
             <button id="reset-button" style="display: none;" onclick="resetTransform();">Reset zoom</button>
         </div>
     </div>
