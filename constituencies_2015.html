@@ -21,7 +21,7 @@
         });
         max_factor = 1.0 / max_factor;
         $.each(signatures, function (data) {
-                paintConstituency(signatures[data]);
+             paintConstituency(signatures[data]);
         });
         if (max_factor == 0) {
             console.log("Intercept error: " + max_factor);
@@ -138,7 +138,7 @@
     }
     function updateTransform() {
         map.rootElement.getElementById("uk").setAttribute("transform",
-                "translate(" + trans[0] + "," + trans[1] + ") "
+                "translate(" + trans[0] / scale + "," + trans[1] / scale + ") "
                 + "scale(" + scale + ")"
         );
         var visible = $('#reset-button').attr("style") != "display: none;";
@@ -179,8 +179,6 @@
     // CubeHelix (https://www.mrao.cam.ac.uk/~dag/CUBEHELIX/)
     // Use start=3.0, rots=1.5, hue=1.0, gamma=1.2
     function CubeHelixRGB(fract,start,rots,hue,gamma){
-        <!-- console.log("fract: " + fract); -->
-
         var angle = 2*Math.PI*(start/3.0+1+rots*fract);
         var amp=hue*fract*(1-fract)/2.0;
 
@@ -235,7 +233,7 @@
         var page_w = window.innerWidth * 0.8;
         var page_h = window.innerHeight;
         page_w -= 15 * 2; // Subtract padding
-        page_h -= 15;
+        page_h -= 15 * 5 + $('#action').height() + $('#background').height();
         console.log("page geometry: " + page_w + "x" + page_h);
         var max_area = 0;
         var cand_w = page_w;
@@ -243,6 +241,7 @@
 
         map.rootElement.setAttribute("width", cand_w);
         map.rootElement.setAttribute("height", cand_h);
+        $('#list-area').height(cand_h - 22);
     }
     </script>
     <style media="screen" type="text/css">
@@ -254,6 +253,7 @@
             margin: 8px;
             padding: 0;
         }
+        header { min-height: 29px; }
         h1 {
             font-family: "Tebuchet MS", Verdana, Arial, sans-serif;
             color: #000;
@@ -270,6 +270,7 @@
         ul { list-style-type: circle; }
         #controls { font-size: 1.8em; text-align: center; }
         #info { text-align: center; }
+        #background { min-height: 75px; }
         #map-area {
             text-align: center;
             display: inline-block;
@@ -293,7 +294,6 @@
 <body onload="init();">
     <header>
         <a id="petition-link" href="https://petition.parliament.uk/petitions/107516"><h1 id="action"></h1></a>
-        <h3 id="background"></h3>
     </header>
     <div id="sidebar">
         <div id="list-area">
@@ -306,14 +306,15 @@
             <button id="reset-button" style="display: none;" onclick="resetTransform();">Reset zoom</button>
         </div>
     </div>
+    <div id="info">
+        <h3 id="background"></h3>
+        <p>Permalink: <a id="permalink"></a></p>
+    </div>
     <div id="controls"><p>
         Fetch petition:
         <input name="new-id" id="new-id" type="number" min="1" max="999999" onchange="change();"></input>
         <span id="error-text"></span>
     </p></div>
-    <div id="info"><p>
-        Permalink: <a id="permalink"></a>
-    </p><div>
     <footer>
         <span><a href="https://www.mrao.cam.ac.uk/~dag/CUBEHELIX/">Cubehelix by <i>Dave Green</i></a></span> |
         <span><a href="https://commons.wikimedia.org/wiki/File:2015UKElectionMap.svg">boundry data</a> from Wikimedia Commons user <a href="https://commons.wikimedia.org/wiki/User:Brythones"><i>Brythones</i></a> <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.en">CC BY-SA 4.0</a></span> |
