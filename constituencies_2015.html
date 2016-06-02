@@ -40,6 +40,8 @@
         // console.log(name + "("+ data.signature_count + ")"+ "=" + magnitude);
         var svg_element=map.getElementById(name);
         svg_element.setAttribute("style", "fill: rgb(" + palette(1 - magnitude) + ");");
+        var title = svg_element.children[0];
+        title.textContent = title.textContent.replace(/:.*/, "") + ": " + data.signature_count;
         // console.log(svg_element.getAttribute("style"));
     }
     function loadPetition(id) {
