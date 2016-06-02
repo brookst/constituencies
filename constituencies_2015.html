@@ -20,7 +20,7 @@
             }
         });
         for (tick=0; tick <= 10; tick++) {
-            $('#scale').children()[tick*2+1].textContent = Math.round(max_factor * (1.0 - tick / 10.0));
+            $('#labels').children()[tick].textContent = Math.round(max_factor * (1.0 - tick / 10.0));
         }
         console.log("max(signature_count): " + max_factor);
         max_factor = 1.0 / max_factor;
@@ -180,17 +180,18 @@
         loadPetition(petition_id);
 
         for (tick=0; tick <= 10; tick++) {
-            $('#scale').children()[tick*2].setAttribute("style", "fill: rgb(" + palette(tick/10.0) + ");");
+            $('#colorbar').children()[tick].setAttribute("style", "fill: rgb(" + palette(tick/10.0) + ");");
+            $('#cubeHelix').children()[tick].setAttribute("style", "stop-color: rgb(" + palette(tick/10.0) + ");");
         }
         console.log(scale[0]);
 
         loadCatalog();
     }
     function palette(param) {
-        return CubeHelixRGB(param, 2.5, 1.5, 1.6, 1.0);
+        return CubeHelixRGB(param, 0, 1.5, 1.6, 1.0);
     }
     // CubeHelix (https://www.mrao.cam.ac.uk/~dag/CUBEHELIX/)
-    // Use start=3.0, rots=1.5, hue=1.0, gamma=1.2
+    // Use start=0.0, rots=1.5, hue=1.0, gamma=1.2
     function CubeHelixRGB(fract,start,rots,hue,gamma){
         var angle = 2*Math.PI*(start/3.0+1+rots*fract);
         var amp=hue*fract*(1-fract)/2.0;
@@ -319,17 +320,59 @@
         <object data="constituencies_2015.svg" id="svg-map" type="image/svg+xml"></object>
         <div id="scale-float" style="position: absolute; top: 0; right: 0;">
             <svg id="scale" width="75" height="220">
-                <rect x="15" y="000" width="15" height="20"/><text x="30" y="015">000</text>
-                <rect x="15" y="020" width="15" height="20"/><text x="30" y="035">020</text>
-                <rect x="15" y="040" width="15" height="20"/><text x="30" y="055">040</text>
-                <rect x="15" y="060" width="15" height="20"/><text x="30" y="075">060</text>
-                <rect x="15" y="080" width="15" height="20"/><text x="30" y="095">080</text>
-                <rect x="15" y="100" width="15" height="20"/><text x="30" y="115">100</text>
-                <rect x="15" y="120" width="15" height="20"/><text x="30" y="135">120</text>
-                <rect x="15" y="140" width="15" height="20"/><text x="30" y="155">140</text>
-                <rect x="15" y="160" width="15" height="20"/><text x="30" y="175">160</text>
-                <rect x="15" y="180" width="15" height="20"/><text x="30" y="195">180</text>
-                <rect x="15" y="200" width="15" height="20"/><text x="30" y="215">200</text>
+                <g id="labels">
+                    <text x="30" y="015">100%</text>
+                    <text x="30" y="035">90%</text>
+                    <text x="30" y="055">80%</text>
+                    <text x="30" y="075">70%</text>
+                    <text x="30" y="095">60%</text>
+                    <text x="30" y="115">50%</text>
+                    <text x="30" y="135">40%</text>
+                    <text x="30" y="155">30%</text>
+                    <text x="30" y="175">20%</text>
+                    <text x="30" y="195">10%</text>
+                    <text x="30" y="215">0%</text>
+                </g>
+                <rect y="000" width="30" height="20"  fill="rgb(0,0,0)"      />
+                <rect y="200" width="30" height="20"  fill="rgb(255,255,255)"/>
+                <rect y="010" width="30" height="200" fill="url(#cubeHelix)" />
+                <g id="colorbar">
+                    <rect y="000" width="30" height="20" mask="url(#fade)" fill="rgb(0,0,0)"       />
+                    <rect y="020" width="30" height="20" mask="url(#fade)" fill="rgb(50,9,47)"     />
+                    <rect y="040" width="30" height="20" mask="url(#fade)" fill="rgb(108,26,31)"   />
+                    <rect y="060" width="30" height="20" mask="url(#fade)" fill="rgb(106,76,0)"    />
+                    <rect y="080" width="30" height="20" mask="url(#fade)" fill="rgb(57,140,24)"   />
+                    <rect y="100" width="30" height="20" mask="url(#fade)" fill="rgb(37,174,127)"  />
+                    <rect y="120" width="30" height="20" mask="url(#fade)" fill="rgb(96,168,231)"  />
+                    <rect y="140" width="30" height="20" mask="url(#fade)" fill="rgb(196,155,255)" />
+                    <rect y="160" width="30" height="20" mask="url(#fade)" fill="rgb(255,173,224)" />
+                    <rect y="180" width="30" height="20" mask="url(#fade)" fill="rgb(255,219,208)" />
+                    <rect y="200" width="30" height="20" mask="url(#fade)" fill="rgb(255,255,255)" />
+                </g>
+                <defs>
+                    <linearGradient id="cubeHelix" x1="0" x2="0" y1="0" y2="100%">
+                        <stop style="stop-color:rgb(0,0,0)"       offset="0%"/>
+                        <stop style="stop-color:rgb(50,9,47)"     offset="10%"/>
+                        <stop style="stop-color:rgb(108,26,31)"   offset="20%"/>
+                        <stop style="stop-color:rgb(106,76,0)"    offset="30%"/>
+                        <stop style="stop-color:rgb(57,140,24)"   offset="40%"/>
+                        <stop style="stop-color:rgb(37,174,127)"  offset="50%"/>
+                        <stop style="stop-color:rgb(96,168,231)"  offset="60%"/>
+                        <stop style="stop-color:rgb(196,155,255)" offset="70%"/>
+                        <stop style="stop-color:rgb(255,173,224)" offset="80%"/>
+                        <stop style="stop-color:rgb(255,219,208)" offset="90%"/>
+                        <stop style="stop-color:rgb(255,255,255)" offset="100%"/>
+                    </linearGradient>
+                    <linearGradient id="leftFade" x1="0" x2="1" y1="0" y2="0">
+                        <stop style="stop-opacity:0; stop-color:white" offset="0%"/>
+                        <stop style="stop-opacity:0; stop-color:white" offset="20%"/>
+                        <stop style="stop-opacity:0.5; stop-color:white" offset="80%"/>
+                        <stop style="stop-opacity:1; stop-color:white" offset="100%"/>
+                    </linearGradient>
+                    <mask id="fade" maskContentUnits="objectBoundingBox">
+                      <rect width="1" height="1" fill="url(#leftFade)"/>
+                    </mask>
+                </defs>
             </svg>
         </div>
         <div id="reset-float" style="position: absolute; bottom: 0; right: 0;">
