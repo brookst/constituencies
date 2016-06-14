@@ -40,7 +40,10 @@
         // console.log(name + "("+ data.signature_count + ")"+ "=" + magnitude);
         var svg_element=map.getElementById(name);
         svg_element.setAttribute("style", "fill: rgb(" + palette(1 - magnitude) + ");");
-        var title = svg_element.children[0];
+        // Safari doesn't support '.children' on SVG elements. See workaround:
+        // http://stackoverflow.com/questions/28538841/accessing-svg-children-in-safari
+        var svgChildren = svg_element.children || svg_element.childNodes;
+        var title = svgChildren[0];
         title.textContent = title.textContent.replace(/:.*/, "") + ": " + data.signature_count;
         // console.log(svg_element.getAttribute("style"));
     }
