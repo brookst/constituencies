@@ -19,6 +19,7 @@
                 max_factor = signatures[data].signature_count;
             }
         });
+        max_factor = Math.ceil(max_factor * 0.1) * 10;
         for (tick=0; tick <= 10; tick++) {
             $('#labels').children()[tick].textContent = Math.round(max_factor * (1.0 - tick / 10.0));
         }
